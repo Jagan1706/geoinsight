@@ -44,4 +44,4 @@ geoinsight/
 
 ## Application Screenshots
 ## Dashboard
-![Dashboard](Screenshots/dashboard.png)
+![Dashboard](geoinsight/Screenshots/dashboard.png)
