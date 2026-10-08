@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GeoInsight Pro</title>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<style>
+:root{
+  --bg:#0a1124;
+  --side:#0c1429;
+  --pn:#101a35;
+  --ln:#1c2a4d;
+  --tx:#e8edfa;
+  --mu:#8c99ba;
+  --bl:#2f6bff;
+  --gr:#22c55e;
+  --or:#f5a524;
+  --rd:#ef4444;
+  --vi:#7c5cff;
+}
+
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  min-height:100%;
+}
+
+body{
+  font:13px/1.45 Inter,system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--tx);
+}
+
+button,input,select{
+  font:inherit;
+  color:var(--tx);
+  background:var(--pn);
+  border:1px solid var(--ln);
+  border-radius:8px;
+  padding:7px 10px;
+}
+
+button{
+  cursor:pointer;
+}
+
+button:hover{
+  filter:brightness(1.12);
+}
+
+:focus-visible{
+  outline:2px solid var(--bl);
+  outline-offset:1px;
+}
+
+/* HEADER */
+header{
+  height:60px;
+  display:flex;
+  align-items:center;
+  gap:20px;
+  padding:0 20px;
+  border-bottom:1px solid var(--ln);
+  background:var(--side);
+}
+
+.logo{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  width:200px;
+}
+
+.logo i{
+  width:34px;
+  height:34px;
+  border-radius:9px;
+  background:linear-gradient(135deg,#2f6bff,#22d3ee);
+  display:grid;
+  place-items:center;
+  font-style:normal;
+}
+
+.logo b{
+  font-size:16px;
+  display:block;
+  line-height:1.1;
+}
+
+.logo small{
+  color:var(--mu);
+  font-size:10px;
+}
+
+.search{
+  flex:0 1 460px;
+  margin:0 auto;
+  position:relative;
+}
+
+.search input{
+  width:100%;
+  padding:9px 60px 9px 34px;
+  background:var(--pn);
+}
+
+.search:before{
+  content:"⌕";
+  position:absolute;
+  left:12px;
+  top:6px;
+  font-size:16px;
+  color:var(--mu);
+}
+
+.search kbd{
+  position:absolute;
+  right:8px;
+  top:7px;
+  color:var(--mu);
+  font-size:11px;
+  border:1px solid var(--ln);
+  border-radius:5px;
+  padding:1px 6px;
+}
+
+.user{
+  margin-left:auto;
+  display:flex;
+  gap:14px;
+  align-items:center;
+}
+
+.av{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:#16b8d4;
+  display:grid;
+  place-items:center;
+  font-weight:700;
+}
+
+/* LAYOUT */
+.shell{
+  display:flex;
+  min-height:calc(100vh - 60px);
+}
+
+aside{
+  width:220px;
+  background:var(--side);
+  border-right:1px solid var(--ln);
+  padding:14px 12px;
+  display:flex;
+  flex-direction:column;
+  flex-shrink:0;
+}
+
+aside a{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  padding:10px 12px;
+  border-radius:8px;
+  color:#c4cde4;
+  text-decoration:none;
+  margin-bottom:4px;
+  cursor:pointer;
+}
+
+aside a.on{
+  background:#1b3a86;
+  color:#fff;
+}
+
+aside a:hover{
+  background:#142349;
+}
+
+aside small{
+  color:var(--mu);
+  margin:14px 12px 6px;
+  font-size:11px;
+}
+
+.sys{
+  margin-top:auto;
+  border:1px solid var(--ln);
+  border-radius:10px;
+  padding:10px;
+  font-size:12px;
+}
+
+.dot{
+  display:inline-block;
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:var(--gr);
+  margin-right:8px;
+}
+
+main{
+  flex:1;
+  min-width:0;
+  padding:22px 24px;
+}
+
+h1{
+  margin:0;
+  font-size:24px;
+}
+
+.sub{
+  color:var(--mu);
+  margin:2px 0 18px;
+}
+
+.cols{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 300px;
+  gap:18px;
+}
+
+.pn{
+  background:var(--pn);
+  border:1px solid var(--ln);
+  border-radius:14px;
+  padding:14px;
+}
+
+.pn h3{
+  margin:0 0 10px;
+  font-size:14px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:16px;
+}
+
+.st{
+  display:flex;
+  gap:14px;
+  align-items:center;
+}
+
+.ic{
+  width:46px;
+  height:46px;
+  border-radius:11px;
+  display:grid;
+  place-items:center;
+  font-size:20px;
+  flex-shrink:0;
+}
+
+.st span{
+  color:var(--mu);
+  font-size:12px;
+}
+
+.st b{
+  font-size:24px;
+  display:block;
+  line-height:1.2;
+}
+
+.up{
+  color:var(--gr);
+  font-size:11px;
+}
+
+/* MAP */
+.mapwrap{
+  position:relative;
+  margin-top:8px;
+}
+
+#map{
+  height:450px;
+  width:100%;
+  border-radius:12px;
+  background:#0a1124;
+  overflow:hidden;
+  border:1px solid var(--ln);
+}
+
+/* Map control panel */
+.lay{
+  position:absolute;
+  z-index:500;
+  left:14px;
+  top:14px;
+  background:rgba(12,20,41,.96);
+  border:1px solid #31436d;
+  box-shadow:0 8px 25px rgba(0,0,0,.35);
+  border-radius:12px;
+  padding:12px;
+  width:175px;
+  backdrop-filter:blur(8px);
+}
+
+.lay-title{
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.lay label{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin:7px 0;
+  cursor:pointer;
+}
+
+.lay select{
+  width:100%;
+  padding:7px;
+  margin-top:5px;
+}
+
+.layer-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  display:inline-block;
+}
+
+.map-actions{
+  display:flex;
+  gap:7px;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid var(--ln);
+}
+
+.map-actions button{
+  flex:1;
+  font-size:11px;
+  padding:7px 5px;
+}
+
+.street-btn{
+  background:#2f6bff;
+  border-color:#2f6bff;
+  color:#fff;
+  font-weight:600;
+}
+
+.fit-btn{
+  background:transparent;
+}
+
+/* Leaflet */
+.leaflet-control-zoom a{
+  background:#0c1429!important;
+  color:#fff!important;
+  border-color:#31436d!important;
+}
+
+.leaflet-control-attribution{
+  background:rgba(12,20,41,.8)!important;
+  color:#9da9c4!important;
+}
+
+.leaflet-control-attribution a{
+  color:#7fa8ff!important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip{
+  background:#0c1429;
+  color:var(--tx);
+  border:1px solid var(--ln);
+  border-radius:10px;
+}
+
+.leaflet-popup-content{
+  margin:12px;
+  min-width:220px;
+}
+
+.kv{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin:3px 0;
+}
+
+.kv span{
+  color:var(--mu);
+}
+
+/* COMMON */
+.mh{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.pill{
+  font-size:11px;
+  color:var(--gr);
+  background:#12341f;
+  border-radius:20px;
+  padding:2px 9px;
+}
+
+.pill.failed{
+  color:var(--rd);
+  background:#3a1620;
+}
+
+.btn{
+  background:var(--bl);
+  border-color:var(--bl);
+  color:#fff;
+  font-weight:600;
+}
+
+.btn.o{
+  background:transparent;
+  border-color:var(--ln);
+}
+
+.qs{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.qs div{
+  border:1px solid var(--ln);
+  border-radius:10px;
+  padding:10px;
+}
+
+.qs span{
+  color:var(--mu);
+  font-size:12px;
+}
+
+.qs b{
+  display:block;
+  font-size:20px;
+}
+
+.fi{
+  width:46px;
+  height:46px;
+  border-radius:11px;
+  background:var(--bl);
+  display:grid;
+  place-items:center;
+  font-size:20px;
+}
+
+.donut{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.leg div{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:5px 0;
+}
+
+.leg i{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+}
+
+.leg b{
+  margin-left:auto;
+}
+
+.rf{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:8px 0;
+}
+
+.rf .fi{
+  width:34px;
+  height:34px;
+  font-size:14px;
+  background:#17275a;
+}
+
+.rf small{
+  color:var(--mu);
+}
+
+.rf>div:nth-child(2){
+  flex:1;
+}
+
+.api{
+  margin:22px 0 0;
+  display:grid;
+  grid-template-columns:300px minmax(0,1fr) minmax(0,1fr);
+  padding:0;
+  overflow:hidden;
+}
+
+.api>div{
+  padding:14px;
+  border-right:1px solid var(--ln);
+}
+
+.api>div:last-child{
+  border:0;
+}
+
+.ep{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:8px;
+  border-radius:8px;
+  cursor:pointer;
+  margin-bottom:4px;
+}
+
+.ep.on{
+  background:#1b3a86;
+}
+
+.ep small{
+  display:block;
+  color:var(--mu);
+}
+
+.ep code{
+  font-size:12px;
+}
+
+.m{
+  display:inline-block;
+  min-width:52px;
+  text-align:center;
+  border-radius:5px;
+  padding:2px 6px;
+  font-weight:700;
+  font-size:11px;
+  color:#04140b;
+}
+
+.GET{
+  background:#16c28a;
+}
+
+.POST{
+  background:#18c07a;
+}
+
+.DELETE{
+  background:var(--rd);
+  color:#fff;
+}
+
+.urlbar{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.urlbar input{
+  flex:1;
+  font-family:ui-monospace,monospace;
+}
+
+.tabs{
+  display:flex;
+  gap:18px;
+  border-bottom:1px solid var(--ln);
+  margin-bottom:12px;
+}
+
+.tabs a{
+  padding:6px 2px;
+  color:var(--mu);
+  cursor:pointer;
+}
+
+.tabs a.on{
+  color:var(--tx);
+  border-bottom:2px solid var(--bl);
+}
+
+#drop{
+  border:1.5px dashed #34457a;
+  border-radius:10px;
+  padding:20px;
+  text-align:center;
+  color:var(--mu);
+}
+
+#drop.o{
+  border-color:var(--bl);
+  background:#12204a;
+}
+
+#drop u{
+  color:#5b9bff;
+  cursor:pointer;
+}
+
+.chip{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:10px;
+  background:#0c1429;
+  border:1px solid var(--ln);
+  border-radius:8px;
+  padding:8px 10px;
+}
+
+.chip button{
+  margin-left:auto;
+  padding:0 8px;
+  border:0;
+}
+
+progress{
+  width:100%;
+  margin-top:8px;
+}
+
+.code{
+  background:#0a1124;
+  border:1px solid var(--ln);
+  border-radius:8px;
+  display:flex;
+  font:12px/1.7 ui-monospace,monospace;
+  min-height:170px;
+  max-height:300px;
+  overflow:auto;
+}
+
+.code .n{
+  color:#52618c;
+  text-align:right;
+  padding:8px 10px;
+  border-right:1px solid var(--ln);
+  user-select:none;
+}
+
+.code pre{
+  margin:0;
+  padding:8px 12px;
+  white-space:pre-wrap;
+  word-break:break-all;
+}
+
+.ok{
+  color:var(--gr);
+  background:#12341f;
+  border-radius:20px;
+  padding:2px 10px;
+  font-weight:600;
+}
+
+.er{
+  color:var(--rd);
+  background:#3a1620;
+  border-radius:20px;
+  padding:2px 10px;
+  font-weight:600;
+}
+
+.empty{
+  color:var(--mu);
+  text-align:center;
+  padding:30px 10px;
+}
+
+#toast{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:2000;
+  background:var(--pn);
+  border:1px solid var(--gr);
+  border-radius:10px;
+  padding:10px 14px;
+  display:none;
+}
+
+.menu{
+  position:relative;
+}
+
+.menu div{
+  display:none;
+  position:absolute;
+  right:0;
+  top:26px;
+  background:#0c1429;
+  border:1px solid var(--ln);
+  border-radius:8px;
+  z-index:50;
+  padding:4px;
+}
+
+.menu:focus-within div{
+  display:block;
+}
+
+.menu div button{
+  border:0;
+  color:var(--rd);
+  white-space:nowrap;
+}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .cols{
+    grid-template-columns:1fr;
+  }
+
+  .api{
+    grid-template-columns:1fr;
+  }
+
+  .api>div{
+    border-right:0;
+    border-bottom:1px solid var(--ln);
+  }
+}
+
+@media(max-width:760px){
+  aside{
+    display:none;
+  }
+
+  .stats,
+  .qs{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .logo{
+    width:auto;
+  }
+
+  #map{
+    height:400px;
+  }
+
+  .lay{
+    width:155px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <i>◈</i>
+    <div>
+      <b>GeoInsight Pro</b>
+      <small>Geospatial Intelligence Platform</small>
+    </div>
+  </div>
+
+  <div class="search">
+    <input id="q"
+           placeholder="Search files, features, or API endpoints..."
+           aria-label="Search">
+    <kbd>Ctrl + K</kbd>
+  </div>
+
+  <div class="user">
+    <span>☾</span>
+    <span>🔔</span>
+    <div class="av">JP</div>
+    <div>
+      <b>Jagan PM</b><br>
+      <small style="color:var(--mu)">Developer</small>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+
+<aside>
+  <a class="on" href="#top">▦ Dashboard</a>
+  <a href="#recent">▤ Files</a>
+  <a href="#explorer" onclick="pickUpload()">⇪ Upload</a>
+  <a href="#qs">▥ Analytics</a>
+  <a href="#top">◈ Map Viewer</a>
+
+  <small>• API</small>
+
+  <a href="#explorer">‹/› API Explorer</a>
+  <a href="/docs" target="_blank">▯ Documentation</a>
+  <a>⚙ Settings</a>
+
+  <div class="sys">
+    <small style="margin:0;display:block">System Status</small>
+    <div style="margin-top:8px">
+      <span class="dot" id="dot"></span>
+      <span id="sysx">API Online</span>
+      <span style="float:right;color:var(--mu)">v1.0</span>
+    </div>
+  </div>
+</aside>
+
+<main id="top">
+
+<h1>Welcome back, Jagan!</h1>
+<p class="sub">
+  Manage your geospatial data, explore insights and use our powerful API.
+</p>
+
+<div class="cols">
+
+<div>
+
+<div class="stats" id="stats"></div>
+
+<div class="pn">
+
+  <div class="mh">
+    <h3 style="margin:0">◈ Map Viewer</h3>
+    <span id="mname" style="color:var(--mu)"></span>
+    <span id="mstat"></span>
+  </div>
+
+  <div class="mapwrap">
+
+    <div id="map"></div>
+
+    <div class="lay">
+
+      <div class="lay-title">Layers</div>
+
+      <div id="layers">
+        <div style="color:var(--mu);margin:6px 0">
+          No layers
+        </div>
+      </div>
+
+      <div style="margin-top:10px">
+        <b>Base Map</b>
+
+        <select id="base">
+          <option>Satellite</option>
+          <option>Streets</option>
+        </select>
+      </div>
+
+      <div class="map-actions">
+        <button class="street-btn"
+                onclick="openCurrentStreetView()">
+          📍 Street View
+        </button>
+
+        <button class="fit-btn"
+                onclick="fitMap()">
+          ⛶ Fit
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<div class="pn" style="margin-top:16px" id="qs">
+  <h3>Quick Stats</h3>
+  <div class="qs" id="qsb"></div>
+</div>
+
+</div>
+
+<div>
+
+<div class="pn" id="info">
+  <h3>▤ File Information</h3>
+  <div class="empty">
+    No file selected.<br>
+    Upload a KML or Shapefile ZIP to begin.
+  </div>
+</div>
+
+<div class="pn" style="margin-top:16px">
+  <h3>Geometry Distribution</h3>
+  <div class="donut" id="donut"></div>
+</div>
+
+<div class="pn" style="margin-top:16px" id="recent">
+  <h3>Recent Files</h3>
+  <div id="rf"></div>
+</div>
+
+</div>
+
+</div>
+
+<div class="pn api" id="explorer">
+
+<div>
+  <h3>
+    API Explorer
+    <span class="pill"
+          style="color:#7fb0ff;background:#142a5c">
+      v1
+    </span>
+  </h3>
+
+  <div id="eps"></div>
+</div>
+
+<div>
+
+  <div class="urlbar">
+    <span class="m" id="mb"></span>
+    <input id="url" aria-label="Request URL">
+    <button class="btn" id="send">Send Request</button>
+  </div>
+
+  <div class="tabs" id="rt">
+    <a data-t="Params">Params</a>
+    <a data-t="Headers">Headers</a>
+    <a data-t="Body" class="on">Body</a>
+  </div>
+
+  <div id="rbody"></div>
+
+</div>
+
+<div>
+
+  <div class="tabs" id="pt">
+    <a data-t="Response" class="on">Response</a>
+    <a data-t="Headers">Headers</a>
+    <a data-t="Curl">Curl</a>
+    <span style="margin-left:auto" id="meta"></span>
+  </div>
+
+  <div class="code">
+    <div class="n" id="ln">1</div>
+    <pre id="out">// Send a request to see the response</pre>
+  </div>
+
+  <div style="margin-top:8px">
+    <button id="copy">Copy response</button>
+  </div>
+
+</div>
+
+</div>
+
+</main>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+
+const EPS=[
+  ["POST","/api/v1/files/","Upload a file"],
+  ["GET","/api/v1/files/","List all files"],
+  ["GET","/api/v1/files/{id}","Get file details"],
+  ["GET","/api/v1/files/{id}/features","Get features"],
+  ["GET","/api/v1/files/{id}/measurements","Get measurements"],
+  ["GET","/api/v1/files/{id}/statistics","Get statistics"],
+  ["DELETE","/api/v1/files/{id}","Delete file"]
+];
+
+const $=s=>document.querySelector(s);
+
+const f1=(n,d=1)=>
+  (+n).toLocaleString(undefined,{maximumFractionDigits:d});
+
+const COL={
+  Polygon:"#22c55e",
+  LineString:"#2f6bff",
+  Point:"#f5a524"
+};
+
+/*
+  CHANGED:
+  Removed CARTO/Dark map because it was showing
+  "API KEY REQUIRED".
+*/
+const TILES={
+  Satellite:[
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    "© Esri"
+  ],
+
+  Streets:[
+    "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "© OpenStreetMap contributors"
+  ]
+};
+
+let files=[];
+let stats={};
+let sel=null;
+let ep=0;
+let file=null;
+let xhr=null;
+let layers={};
+let last={body:"",hdr:"",curl:""};
+let rtab="Body";
+let ptab="Response";
+let tile;
+let currentCenter=null;
+
+/* MAP */
+
+const map=L.map("map",{
+  zoomControl:true,
+  attributionControl:true
+}).setView([12.975,77.6],12);
+
+function setBase(){
+
+  if(tile){
+    map.removeLayer(tile);
+  }
+
+  const t=TILES[$("#base").value];
+
+  tile=L.tileLayer(t[0],{
+    attribution:t[1],
+    maxZoom:19
+  }).addTo(map);
+}
+
+$("#base").onchange=setBase;
+
+setBase();
+
+/*
+  Open Google Maps Street View using the selected
+  map coordinates.
+
+  This uses a Google Maps URL rather than embedding
+  the Google Maps JavaScript API.
+*/
+function openStreetView(lat,lng){
+
+  if(
+    typeof lat!=="number" ||
+    typeof lng!=="number" ||
+    !isFinite(lat) ||
+    !isFinite(lng)
+  ){
+    toast("Select a map feature first",true);
+    return;
+  }
+
+  const url=
+    "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint="
+    +encodeURIComponent(lat+","+lng);
+
+  window.open(url,"_blank","noopener,noreferrer");
+}
+
+/* Street View for current selected feature */
+function openCurrentStreetView(){
+
+  if(!currentCenter){
+    toast("Select a map feature first",true);
+    return;
+  }
+
+  openStreetView(
+    currentCenter.lat,
+    currentCenter.lng
+  );
+}
+
+/* Fit all visible layers */
+function fitMap(){
+
+  const visible=Object.values(layers);
+
+  if(!visible.length){
+    toast("No map features available",true);
+    return;
+  }
+
+  const group=L.featureGroup(visible);
+
+  if(group.getLayers().length){
+    map.fitBounds(group.getBounds().pad(.2));
+  }
+}
+
+function toast(m,bad){
+
+  const t=$("#toast");
+
+  t.textContent=m;
+  t.style.borderColor=
+    bad ? "var(--rd)" : "var(--gr)";
+
+  t.style.display="block";
+
+  clearTimeout(t._h);
+
+  t._h=setTimeout(
+    ()=>t.style.display="none",
+    3200
+  );
+}
+
+/* LOAD DATA */
+
+async function load(){
+
+  try{
+
+    files=
+      await(
+        await fetch("/api/v1/files/")
+      ).json();
+
+    $("#dot").style.background="var(--gr)";
+    $("#sysx").textContent="API Online";
+
+    await Promise.all(
+      files
+        .filter(f=>f.status=="completed"&&!stats[f.id])
+        .map(
+          async f=>
+            stats[f.id]=
+              await(
+                await fetch(
+                  `/api/v1/files/${f.id}/statistics`
+                )
+              ).json()
+        )
+    );
+
+  }catch{
+
+    $("#dot").style.background="var(--rd)";
+    $("#sysx").textContent="API Offline";
+  }
+
+  render();
+
+  if(!sel&&files[0]){
+    show(files[0].id);
+  }
+}
+
+/* DASHBOARD */
+
+function render(){
+
+  const ok=
+    files.filter(
+      f=>f.status=="completed"
+    );
+
+  const S=
+    ok.map(
+      f=>stats[f.id]
+    ).filter(Boolean);
+
+  const A=
+    S.reduce(
+      (a,s)=>a+s.total_area_m2,
+      0
+    );
+
+  const Lg=
+    S.reduce(
+      (a,s)=>a+s.total_length_m,
+      0
+    );
+
+  const np=
+    S.reduce(
+      (a,s)=>a+s.counts.Polygon,
+      0
+    );
+
+  const nl=
+    S.reduce(
+      (a,s)=>a+s.counts.LineString,
+      0
+    );
+
+  const card=(c,i,l,v)=>
+    `<div class="pn st">
+      <div class="ic"
+           style="background:${c}33;color:${c}">
+        ${i}
+      </div>
+      <div>
+        <span>${l}</span>
+        <b>${v}</b>
+      </div>
+    </div>`;
+
+  $("#stats").innerHTML=
+    card(
+      "#2f6bff",
+      "▤",
+      "Total Files",
+      files.length
+    )
+    +
+    card(
+      "#22c55e",
+      "⌖",
+      "Total Features",
+      files.reduce(
+        (a,f)=>a+f.feature_count,
+        0
+      )
+    )
+    +
+    card(
+      "#7c5cff",
+      "⬡",
+      "Total Area",
+      f1(A/1e6,2)+" km²"
+    );
+
+  $("#qsb").innerHTML=[
+    [
+      "Total Area",
+      f1(A/1e6,2)+" km²"
+    ],
+    [
+      "Total Length",
+      f1(Lg/1e3,2)+" km"
+    ],
+    [
+      "Avg. Area",
+      np
+        ? f1(A/np/1e6,3)+" km²"
+        : "–"
+    ],
+    [
+      "Avg. Length",
+      nl
+        ? f1(Lg/nl/1e3,2)+" km"
+        : "–"
+    ]
+  ]
+  .map(
+    ([l,v])=>
+      `<div>
+        <span>${l}</span>
+        <b>${v}</b>
+      </div>`
+  )
+  .join("");
+
+  const q=
+    $("#q").value.toLowerCase();
+
+  const L2=
+    files.filter(
+      f=>f.filename.toLowerCase().includes(q)
+    );
+
+  $("#rf").innerHTML=
+    L2.length
+    ?
+    L2.slice(0,6)
+      .map(
+        f=>
+          `<div class="rf">
+            <div class="fi">▤</div>
+
+            <div>
+              <b style="cursor:pointer"
+                 onclick="show('${f.id}')">
+                ${f.filename}
+              </b>
+
+              <br>
+
+              <small>
+                ${f.feature_count} features
+              </small>
+            </div>
+
+            <div style="text-align:right">
+              <span class="pill ${f.status}">
+                ${f.status}
+              </span>
+
+              <br>
+
+              <small>
+                ${new Date(
+                  f.uploaded_at
+                ).toLocaleDateString()}
+              </small>
+            </div>
+
+            <div class="menu">
+              <button
+                style="border:0"
+                aria-label="Actions">
+                ⋮
+              </button>
+
+              <div>
+                <button
+                  onclick="del('${f.id}')">
+                  Delete file
+                </button>
+              </div>
+            </div>
+
+          </div>`
+      )
+      .join("")
+    :
+    `<div class="empty">
+      No files yet.<br>
+      Upload <b>sample.kml</b> below.
+    </div>`;
+}
+
+/* DONUT */
+
+function donut(c){
+
+  const tot=
+    Object.values(c)
+      .reduce((a,b)=>a+b,0)||1;
+
+  let off=0;
+
+  const R=48;
+  const C=2*Math.PI*R;
+
+  $("#donut").innerHTML=
+    `<svg width="130"
+          height="130"
+          viewBox="0 0 130 130">
+
+      <g transform="rotate(-90 65 65)"
+         fill="none"
+         stroke-width="16">
+
+        <circle
+          cx="65"
+          cy="65"
+          r="${R}"
+          stroke="#1c2a4d"/>
+
+        ${
+          Object.keys(COL)
+          .map(k=>{
+
+            const l=
+              c[k]/tot*C;
+
+            const s=
+              `<circle
+                cx="65"
+                cy="65"
+                r="${R}"
+                stroke="${COL[k]}"
+                stroke-dasharray="${l} ${C-l}"
+                stroke-dashoffset="${-off}"/>`;
+
+            off+=l;
+
+            return s;
+
+          })
+          .join("")
+        }
+
+      </g>
+
+      <text x="65"
+            y="63"
+            text-anchor="middle"
+            fill="#fff"
+            font-size="20"
+            font-weight="700">
+        ${Object.values(c)
+          .reduce((a,b)=>a+b,0)}
+      </text>
+
+      <text x="65"
+            y="80"
+            text-anchor="middle"
+            fill="#8c99ba"
+            font-size="11">
+        Features
+      </text>
+
+    </svg>
+
+    <div class="leg">
+
+      ${
+        Object.keys(COL)
+        .map(
+          k=>
+            `<div>
+              <i style="background:${COL[k]}"></i>
+              ${k}
+              <b>${c[k]}</b>
+            </div>`
+        )
+        .join("")
+      }
+
+    </div>`;
+}
+
+/* SHOW FILE */
+
+async function show(id){
+
+  sel=id;
+
+  const f=
+    files.find(x=>x.id==id);
+
+  if(!f)return;
+
+  $("#info").innerHTML=
+    `<h3>
+      ▤ File Information
+
+      <span
+        class="pill ${f.status}"
+        style="float:right">
+        ${f.status}
+      </span>
+    </h3>
+
+    <div class="rf">
+
+      <div class="fi">▤</div>
+
+      <div>
+        <b>${f.filename}</b>
+        <br>
+        <small>${f.file_type.toUpperCase()} File</small>
+      </div>
+
+      <small style="text-align:right">
+        ${f1(f.size/1048576,2)} MB
+        <br>
+        ${new Date(
+          f.uploaded_at
+        ).toLocaleString()}
+      </small>
+
+    </div>
+
+    <div class="kv">
+      <span>File ID</span>
+      <code
+        style="font-size:11px"
+        title="${f.id}">
+        ${f.id.slice(0,22)}…
+      </code>
+    </div>
+
+    <div class="kv">
+      <span>Features</span>
+      <b>${f.feature_count}</b>
+    </div>
+
+    <div class="kv">
+      <span>CRS</span>
+      <b>${f.crs}</b>
+    </div>
+
+    <div class="kv">
+      <span>Format</span>
+      <b>${f.file_type.toUpperCase()}</b>
+    </div>
+
+    <div style="
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:12px">
+
+      <button
+        class="btn"
+        onclick="run(3)">
+        View Features
+      </button>
+
+      <button
+        class="btn o"
+        onclick="run(5)">
+        View Statistics
+      </button>
+
+    </div>`;
+
+  $("#mname").textContent=f.filename;
+
+  $("#mstat").innerHTML=
+    `<span class="pill">${f.status}</span>`;
+
+  if(f.status!="completed")return;
+
+  const gj=
+    await(
+      await fetch(
+        `/api/v1/files/${id}/features`
+      )
+    ).json();
+
+  Object.values(layers)
+    .forEach(
+      l=>map.removeLayer(l)
+    );
+
+  layers={};
+
+  $("#layers").innerHTML="";
+
+  currentCenter=null;
+
+  for(const t of Object.keys(COL)){
+
+    const fs=
+      gj.features.filter(
+        x=>
+          x.properties._type
+           .replace("Multi","")
+          ==t
+      );
+
+    if(!fs.length)continue;
+
+    layers[t]=
+      L.geoJSON(
+        {
+          type:"FeatureCollection",
+          features:fs
+        },
+        {
+          style:{
+            color:COL[t],
+            weight:3,
+            fillOpacity:.25
+          },
+
+          pointToLayer:(_,ll)=>
+            L.circleMarker(
+              ll,
+              {
+                radius:6,
+                color:COL[t],
+                fillOpacity:.9
+              }
+            ),
+
+          onEachFeature:(ft,l)=>{
+
+            const p=ft.properties;
+            const m=p._measurement;
+
+            let center;
+
+            try{
+
+              if(
+                l.getBounds &&
+                l.getBounds().isValid()
+              ){
+                center=
+                  l.getBounds().getCenter();
+              }
+              else if(l.getLatLng){
+                center=l.getLatLng();
+              }
+
+            }catch{}
+
+            if(center){
+              currentCenter=center;
+            }
+
+            const streetButton=
+              center
+              ?
+              `<button
+                class="street-btn"
+                style="
+                  width:100%;
+                  margin-top:8px"
+                onclick="
+                  openStreetView(
+                    ${center.lat},
+                    ${center.lng}
+                  )">
+                📍 Open Street View
+              </button>`
+              :
+              "";
+
+            l.bindPopup(
+              `<b>Feature #${ft.id}</b>
+
+              <div class="kv">
+                <span>Geometry Type</span>
+                ${p._type}
+              </div>
+
+              ${
+                m
+                ?
+                Object.entries(m)
+                .slice(0,2)
+                .map(
+                  ([k,v])=>
+                    `<div class="kv">
+                      <span>${k}</span>
+                      ${f1(v,2)}
+                    </div>`
+                )
+                .join("")
+                :
+                ""
+              }
+
+              <div class="kv">
+                <span>CRS</span>
+                ${f.crs}
+              </div>
+
+              <b>Properties</b>
+
+              ${
+                Object.entries(p)
+                .filter(
+                  ([k])=>k[0]!="_"
+                )
+                .slice(0,3)
+                .map(
+                  ([k,v])=>
+                    `<div class="kv">
+                      <span>${k}</span>
+                      ${v??"–"}
+                    </div>`
+                )
+                .join("")
+              }
+
+              ${streetButton}
+
+              <button
+                class="btn"
+                style="
+                  width:100%;
+                  margin-top:8px"
+                onclick="run(4)">
+                View Details
+              </button>`
+            );
+          }
+        }
+      ).addTo(map);
+
+    $("#layers")
+      .insertAdjacentHTML(
+        "beforeend",
+
+        `<label>
+          <input
+            type="checkbox"
+            checked
+            data-t="${t}">
+
+          <i class="layer-dot"
+             style="background:${COL[t]}"></i>
+
+          ${t}s
+        </label>`
+      );
+  }
+
+  document
+    .querySelectorAll("#layers input")
+    .forEach(
+      c=>
+        c.onchange=()=>
+          c.checked
+          ?
+          layers[c.dataset.t].addTo(map)
+          :
+          map.removeLayer(
+            layers[c.dataset.t]
+          )
+    );
+
+  const g=
+    L.featureGroup(
+      Object.values(layers)
+    );
+
+  if(g.getLayers().length){
+    map.fitBounds(
+      g.getBounds().pad(.2)
+    );
+
+    currentCenter=
+      g.getBounds().getCenter();
+  }
+
+  if(stats[id]){
+    donut(stats[id].counts);
+  }
+}
+
+/* DELETE */
+
+async function del(id){
+
+  if(
+    !confirm(
+      "Delete this file and its measurements?"
+    )
+  )return;
+
+  const r=
+    await fetch(
+      "/api/v1/files/"+id,
+      {
+        method:"DELETE"
+      }
+    );
+
+  toast(
+    r.ok
+      ? "File deleted"
+      : "Delete failed",
+    !r.ok
+  );
+
+  if(sel==id){
+
+    sel=null;
+
+    Object.values(layers)
+      .forEach(
+        l=>map.removeLayer(l)
+      );
+
+    layers={};
+    currentCenter=null;
+  }
+
+  delete stats[id];
+
+  load();
+}
+
+/* API EXPLORER */
+
+$("#eps").innerHTML=
+  EPS.map(
+    (e,i)=>
+      `<div
+        class="ep"
+        tabindex="0"
+        data-i="${i}">
+
+        <span class="m ${e[0]}">
+          ${e[0]}
+        </span>
+
+        <div>
+          <code>${e[1]}</code>
+          <small>${e[2]}</small>
+        </div>
+
+      </div>`
+  )
+  .join("");
+
+document
+  .querySelectorAll(".ep")
+  .forEach(
+    el=>{
+
+      el.onclick=
+        ()=>pickEp(
+          +el.dataset.i
+        );
+
+      el.onkeydown=
+        e=>
+          e.key=="Enter" &&
+          pickEp(
+            +el.dataset.i
+          );
+    }
+  );
+
+function pickEp(i){
+
+  ep=i;
+
+  const e=EPS[i];
+
+  document
+    .querySelectorAll(".ep")
+    .forEach(
+      (x,j)=>
+        x.classList.toggle(
+          "on",
+          j==i
+        )
+    );
+
+  $("#mb").textContent=e[0];
+
+  $("#mb").className=
+    "m "+e[0];
+
+  $("#url").value=
+    e[1].replace(
+      "{id}",
+      sel||"{id}"
+    );
+
+  rbody();
+}
+
+function pickUpload(){
+  pickEp(0);
+}
+
+function rbody(){
+
+  const e=EPS[ep];
+  const h=$("#rbody");
+
+  if(rtab=="Headers"){
+
+    h.innerHTML=
+      `<div class="kv">
+        <span>Accept</span>
+        application/json
+      </div>
+
+      ${
+        e[0]=="POST"
+        ?
+        `<div class="kv">
+          <span>Content-Type</span>
+          multipart/form-data
+        </div>`
+        :
+        ""
+      }`;
+
+  }
+
+  else if(rtab=="Params"){
+
+    h.innerHTML=
+      e[1].includes("{id}")
+      ?
+      `<div class="kv">
+        <span>id (path)</span>
+        <b>
+          ${sel||"select a file or edit the URL"}
+        </b>
+      </div>`
+      :
+      `<div class="empty">
+        No parameters
+      </div>`;
+
+  }
+
+  else if(e[0]=="POST"){
+
+    h.innerHTML=
+      `<b>File Upload</b>
+
+      <div
+        id="drop"
+        style="margin-top:8px">
+
+        ⇪<br>
+
+        Drag &amp; drop a file here<br>
+
+        or
+        <u id="br">
+          click to browse
+        </u>
+
+        <br>
+
+        <small>
+          KML, ZIP (Shapefile) · Max 50 MB
+        </small>
+
+        <input
+          id="fi"
+          type="file"
+          accept=".kml,.zip"
+          hidden>
+
+      </div>
+
+      <div id="chip"></div>
+
+      <progress
+        id="pg"
+        value="0"
+        max="100"
+        hidden>
+      </progress>
+
+      <div style="margin-top:8px">
+        <button id="cancel" hidden>
+          Cancel Upload
+        </button>
+      </div>`;
+
+    const d=$("#drop");
+
+    $("#br").onclick=
+      ()=>$("#fi").click();
+
+    $("#fi").onchange=
+      x=>
+        setF(
+          x.target.files[0]
+        );
+
+    d.ondragover=
+      x=>{
+        x.preventDefault();
+        d.className="o";
+      };
+
+    d.ondragleave=
+      ()=>d.className="";
+
+    d.ondrop=
+      x=>{
+        x.preventDefault();
+        d.className="";
+        setF(
+          x.dataTransfer.files[0]
+        );
+      };
+
+    $("#cancel").onclick=
+      ()=>xhr&&xhr.abort();
+
+    setF(file);
+
+  }
+
+  else{
+
+    h.innerHTML=
+      `<div class="empty">
+        ${e[0]} requests have no body
+      </div>`;
+  }
+}
+
+function setF(f){
+
+  file=f;
+
+  const c=$("#chip");
+
+  if(c){
+
+    c.innerHTML=
+      f
+      ?
+      `<div class="chip">
+        ▤ ${f.name}
+        <button
+          aria-label="Remove file"
+          onclick="setF(null)">
+          ✕
+        </button>
+      </div>`
+      :
+      "";
+  }
+}
+
+/* REQUEST TABS */
+
+document
+  .querySelectorAll("#rt a")
+  .forEach(
+    a=>
+      a.onclick=()=>{
+
+        rtab=a.dataset.t;
+
+        document
+          .querySelectorAll("#rt a")
+          .forEach(
+            x=>
+              x.classList.toggle(
+                "on",
+                x==a
+              )
+          );
+
+        rbody();
+      }
+  );
+
+/* RESPONSE TABS */
+
+document
+  .querySelectorAll("#pt a")
+  .forEach(
+    a=>
+      a.onclick=()=>{
+
+        ptab=a.dataset.t;
+
+        document
+          .querySelectorAll("#pt a")
+          .forEach(
+            x=>
+              x.classList.toggle(
+                "on",
+                x==a
+              )
+          );
+
+        out();
+      }
+  );
+
+function out(){
+
+  const t=
+    ptab=="Response"
+      ?last.body
+      :ptab=="Headers"
+        ?last.hdr
+        :last.curl;
+
+  $("#out").textContent=
+    t||
+    "// Send a request to see the response";
+
+  $("#ln").innerHTML=
+    (t||"x")
+      .split("\n")
+      .map((_,i)=>i+1)
+      .join("<br>");
+}
+
+function run(i){
+
+  pickEp(i);
+  send();
+}
+
+$("#send").onclick=send;
+
+$("#copy").onclick=
+  ()=>navigator.clipboard
+    .writeText(last.body)
+    .then(
+      ()=>toast("Response copied")
+    );
+
+/* SEND REQUEST */
+
+function send(){
+
+  const e=EPS[ep];
+  const url=$("#url").value;
+
+  if(url.includes("{id}")){
+
+    return toast(
+      "Replace {id} with a file ID or select a file",
+      true
+    );
+  }
+
+  if(e[0]=="POST"&&!file){
+
+    return toast(
+      "Choose a .kml or .zip file first",
+      true
+    );
+  }
+
+  xhr=
+    new XMLHttpRequest();
+
+  const t0=
+    performance.now();
+
+  xhr.open(
+    e[0],
+    url
+  );
+
+  xhr.setRequestHeader(
+    "Accept",
+    "application/json"
+  );
+
+  last.curl=
+    `curl -X ${e[0]} "${location.origin}${url}"`
+    +
+    (
+      e[0]=="POST"
+      ?
+      ` \\\n  -F "file=@${file.name}"`
+      :
+      ""
+    );
+
+  if(e[0]=="POST"){
+
+    const p=$("#pg");
+    const c=$("#cancel");
+
+    if(p){
+      p.hidden=false;
+      p.value=0;
+      c.hidden=false;
+    }
+
+    xhr.upload.onprogress=
+      x=>
+        p&&(
+          p.value=
+            x.loaded/x.total*100
+        );
+  }
+
+  xhr.onload=()=>{
+
+    const ok=
+      xhr.status<300;
+
+    $("#meta").innerHTML=
+      `<span class="${ok?"ok":"er"}">
+        ${xhr.status}
+        ${ok?"OK":"Error"}
+      </span>
+
+      <small>
+        ${(
+          (performance.now()-t0)/1000
+        ).toFixed(2)} s
+      </small>`;
+
+    last.hdr=
+      xhr.getAllResponseHeaders();
+
+    try{
+
+      last.body=
+        JSON.stringify(
+          JSON.parse(
+            xhr.responseText
+          ),
+          null,
+          2
+        );
+
+    }catch{
+
+      last.body=
+        xhr.responseText;
+    }
+
+    out();
+
+    const p=$("#pg");
+
+    if(p){
+      p.hidden=true;
+      $("#cancel").hidden=true;
+    }
+
+    toast(
+      ok
+        ? "Request succeeded"
+        : "Request failed: "+xhr.status,
+      !ok
+    );
+
+    if(e[0]!="GET"||ok){
+      stats={};
+      load();
+    }
+  };
+
+  xhr.onabort=()=>{
+
+    $("#pg").hidden=true;
+    $("#cancel").hidden=true;
+
+    toast("Upload cancelled");
+  };
+
+  xhr.onerror=()=>
+    toast(
+      "Network error — is the API running?",
+      true
+    );
+
+  if(e[0]=="POST"){
+
+    const fd=
+      new FormData();
+
+    fd.append(
+      "file",
+      file
+    );
+
+    xhr.send(fd);
+
+  }else{
+
+    xhr.send();
+  }
+}
+
+/* SEARCH */
+
+$("#q").oninput=render;
+
+document.addEventListener(
+  "keydown",
+  e=>{
+    if(e.ctrlKey&&e.key=="k"){
+      e.preventDefault();
+      $("#q").focus();
+    }
+  }
+);
+
+/* START */
+
+pickEp(0);
+load();
+
+</script>
+
+</body>
+</html>
