@@ -43,5 +43,24 @@ geoinsight/
 └── .gitignore
 
 ## Application Screenshots
-## Dashboard
-![Dashboard](geoinsight/Screenshots/dashboard.png)
+
+### API Explorer
+![API Explorer](Screenshots/api-explorer.png)
+
+### Dashboard
+![Dashboard](Screenshots/dashboard.png)
+
+### File Upload
+![File Upload](Screenshots/file-upload.png)
+
+### Map Viewer
+![Map Viewer](Screenshots/map-viewer.png)
+
+### Measurements
+![Measurements](Screenshots/measurements.png)
+
+### Statistics
+![Statistics](Screenshots/statistics.png)
+
+### Street View
+![Street View](Screenshots/street-view.png)
