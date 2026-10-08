@@ -42,6 +42,6 @@ geoinsight/
 ├── README.md
 └── .gitignore
 
-## Application screenshots
+## Application Screenshots
 ## Dashboard
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](Screenshots/dashboard.png)
